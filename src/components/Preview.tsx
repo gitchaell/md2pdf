@@ -1,12 +1,13 @@
 import { Check, Copy, Printer } from "lucide-react";
 import mermaid from "mermaid";
-import { useEffect, useRef, useState } from "react";
+import { type MutableRefObject, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useReactToPrint } from "react-to-print";
 import remarkGfm from "remark-gfm";
 import { cn } from "../lib/utils";
 import { useStore } from "../store/useStore";
 import { Button } from "./ui/Button";
+import { db } from "../lib/db";
 
 const Mermaid = ({ chart }: { chart: string }) => {
 	const [svg, setSvg] = useState("");
@@ -113,7 +114,57 @@ const CodeBlock = ({ inline, className, children, ...props }: any) => {
 	);
 };
 
-export function Preview() {
+// Custom Image Component to handle local images
+// biome-ignore lint/suspicious/noExplicitAny: Complex type
+const MarkdownImage = ({ node, ...props }: any) => {
+    const [src, setSrc] = useState(props.src);
+
+    useEffect(() => {
+        let objectUrl: string | null = null;
+
+        const loadLocalImage = async () => {
+             if (props.src && props.src.startsWith('local-image://')) {
+                 try {
+                     const id = parseInt(props.src.replace('local-image://', ''), 10);
+                     if (!isNaN(id)) {
+                         const image = await db.images.get(id);
+                         if (image) {
+                             objectUrl = URL.createObjectURL(image.blob);
+                             setSrc(objectUrl);
+                         }
+                     }
+                 } catch (err) {
+                     console.error("Failed to load local image", err);
+                 }
+             } else {
+                 setSrc(props.src);
+             }
+        };
+
+        loadLocalImage();
+
+        return () => {
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
+            }
+        };
+    }, [props.src]);
+
+    return (
+        <img
+            className="max-w-full h-auto rounded-md shadow-sm my-4 mx-auto"
+            alt={props.alt || "Markdown Image"}
+            {...props}
+            src={src}
+        />
+    );
+};
+
+interface PreviewProps {
+    scrollRef?: MutableRefObject<HTMLDivElement | null>;
+}
+
+export function Preview({ scrollRef }: PreviewProps) {
 	const currentDoc = useStore((state) => state.currentDoc);
 	const contentRef = useRef<HTMLDivElement>(null);
 
@@ -150,11 +201,14 @@ export function Preview() {
 				</div>
 			</div>
 
-			<div className="flex-1 overflow-auto p-8 flex justify-center items-start">
+			<div
+                ref={scrollRef}
+                className="flex-1 overflow-auto p-8 flex justify-center items-start scroll-smooth"
+            >
 				<div
 					ref={contentRef}
 					className={cn(
-						"bg-white shadow-lg p-[10mm] min-h-[297mm] w-[210mm]",
+						"bg-white dark:bg-zinc-950 shadow-lg p-[10mm] min-h-[297mm] w-[210mm]",
 						"mx-auto transition-colors duration-200",
 						"prose prose-zinc max-w-none dark:prose-invert",
 						"print:shadow-none print:m-0 print:w-full print:h-auto print:overflow-visible print:p-0",
@@ -175,13 +229,7 @@ export function Preview() {
 							// biome-ignore lint/suspicious/noExplicitAny: Complex type
 							code: CodeBlock as any,
 							// biome-ignore lint/suspicious/noExplicitAny: Complex type
-							img: ({ node, ...props }: any) => (
-								<img
-									className="max-w-full h-auto rounded-md shadow-sm my-4 mx-auto"
-									alt={props.alt || "Markdown Image"}
-									{...props}
-								/>
-							),
+							img: MarkdownImage,
 							table: ({ node, ...props }) => (
 								<div className="overflow-x-auto my-4">
 									<table

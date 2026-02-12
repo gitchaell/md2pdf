@@ -6,6 +6,8 @@ interface EditorState {
 	currentDoc: Document | null;
 	theme: "light" | "dark";
 	sidebarOpen: boolean;
+    sidebarWidth: number;
+    editorWidthPercent: number; // Percentage of the available space
 
 	// Actions
 	loadDocuments: () => Promise<void>;
@@ -16,13 +18,21 @@ interface EditorState {
 	selectDocument: (id: number) => void;
 	setTheme: (theme: "light" | "dark") => void;
 	toggleSidebar: () => void;
+    setSidebarWidth: (width: number) => void;
+    setEditorWidthPercent: (percent: number) => void;
 }
 
 export const useStore = create<EditorState>((set, get) => ({
 	documents: [],
 	currentDoc: null,
-	theme: "light",
+	theme:
+		typeof window !== "undefined" &&
+		window.matchMedia("(prefers-color-scheme: dark)").matches
+			? "dark"
+			: "light",
 	sidebarOpen: true,
+    sidebarWidth: 256, // Default 16rem
+    editorWidthPercent: 50, // Default 50%
 
 	loadDocuments: async () => {
 		const docs = await db.documents.orderBy("updatedAt").reverse().toArray();
@@ -113,4 +123,6 @@ export const useStore = create<EditorState>((set, get) => ({
 	},
 
 	toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+    setSidebarWidth: (width) => set({ sidebarWidth: width }),
+    setEditorWidthPercent: (percent) => set({ editorWidthPercent: percent }),
 }));
