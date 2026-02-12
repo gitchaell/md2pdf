@@ -7,13 +7,25 @@ export interface Document {
 	updatedAt: Date;
 }
 
+export interface Image {
+	id?: number;
+	blob: Blob;
+	mimeType: string;
+	createdAt: Date;
+}
+
 export class MdEditorDB extends Dexie {
 	documents!: Table<Document>;
+	images!: Table<Image>;
 
 	constructor() {
 		super("MdEditorDB");
 		this.version(1).stores({
-			documents: "++id, title, updatedAt", // Primary key and indexed props
+			documents: "++id, title, updatedAt",
+		});
+		this.version(2).stores({
+			documents: "++id, title, updatedAt",
+			images: "++id, createdAt",
 		});
 	}
 }

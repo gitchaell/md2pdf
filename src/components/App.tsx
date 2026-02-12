@@ -1,12 +1,15 @@
 import { Analytics } from "@vercel/analytics/react";
 import { Eye, FileEdit, Menu } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { editor } from "monaco-editor";
 import { useStore } from "../store/useStore";
 import { CodeEditor } from "./CodeEditor";
 import { Preview } from "./Preview";
 import { Sidebar } from "./Sidebar";
 import { Input } from "./ui/Input";
 import { cn } from "../lib/utils";
+import { Resizer } from "./ui/Resizer";
+import { useScrollSync } from "../hooks/useScrollSync";
 
 export function App() {
 	const loadDocuments = useStore((state) => state.loadDocuments);
@@ -17,8 +20,17 @@ export function App() {
 	const documents = useStore((state) => state.documents);
 	const createDocument = useStore((state) => state.createDocument);
     const toggleSidebar = useStore((state) => state.toggleSidebar);
+    const editorWidthPercent = useStore((state) => state.editorWidthPercent);
+    const setEditorWidthPercent = useStore((state) => state.setEditorWidthPercent);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+    const previewScrollRef = useRef<HTMLDivElement>(null);
 
     const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
+
+    // Enable scroll sync only when both panels are visible (Desktop)
+    useScrollSync(editorRef, previewScrollRef, window.innerWidth >= 768 && activeTab !== 'preview' && activeTab !== 'editor');
 
 	useEffect(() => {
 		loadDocuments();
@@ -43,6 +55,17 @@ export function App() {
 			createDocument();
 		}
 	}, [isLoading, documents.length, createDocument]);
+
+    const handlePanelResize = (clientX: number) => {
+        if (!containerRef.current) return;
+
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const newPercent = ((clientX - containerRect.left) / containerRect.width) * 100;
+
+        // Limit between 20% and 80%
+        const limitedPercent = Math.max(20, Math.min(80, newPercent));
+        setEditorWidthPercent(limitedPercent);
+    };
 
 	return (
 		<div className="flex h-screen w-screen overflow-hidden bg-background text-foreground font-sans relative">
@@ -86,13 +109,14 @@ export function App() {
                     </button>
                 </div>
 
-				<div className="flex-1 flex h-full overflow-hidden relative">
+				<div ref={containerRef} className="flex-1 flex h-full overflow-hidden relative">
 					{/* Editor Pane */}
 					<div
                         className={cn(
-                            "flex-1 flex flex-col h-full border-r border-zinc-200 dark:border-zinc-800 min-w-0 bg-background",
-                            activeTab === 'editor' ? "block" : "hidden md:flex"
+                            "flex flex-col h-full border-r border-zinc-200 dark:border-zinc-800 min-w-0 bg-background",
+                            activeTab === 'editor' ? "flex w-full md:w-auto" : "hidden md:flex"
                         )}
+                        style={{ width: activeTab === 'editor' && window.innerWidth < 768 ? '100%' : `${editorWidthPercent}%` }}
                     >
 						<div className="h-14 border-b border-zinc-200 dark:border-zinc-800 flex items-center px-4 bg-white dark:bg-zinc-950 shrink-0">
 							{currentDoc ? (
@@ -109,18 +133,27 @@ export function App() {
 							)}
 						</div>
 						<div className="flex-1 overflow-hidden relative">
-							<CodeEditor />
+							<CodeEditor onMount={(editor) => { editorRef.current = editor; }} />
 						</div>
 					</div>
+
+                    {/* Resizer - Desktop Only */}
+                    <div
+                        className="hidden md:block absolute top-0 bottom-0 z-10 translate-x-[-50%]"
+                        style={{ left: `${editorWidthPercent}%` }}
+                    >
+                        <Resizer onResize={handlePanelResize} />
+                    </div>
 
 					{/* Preview Pane */}
 					<div
                         className={cn(
-                            "flex-1 h-full bg-gray-50 dark:bg-zinc-900 overflow-hidden relative",
-                            activeTab === 'preview' ? "block" : "hidden md:block"
+                            "h-full bg-gray-50 dark:bg-zinc-900 overflow-hidden relative",
+                            activeTab === 'preview' ? "block w-full" : "hidden md:block"
                         )}
+                        style={{ width: activeTab === 'preview' && window.innerWidth < 768 ? '100%' : `${100 - editorWidthPercent}%` }}
                     >
-						<Preview />
+						<Preview scrollRef={previewScrollRef} />
 					</div>
 				</div>
 			</div>
