@@ -10,6 +10,7 @@ interface CodeEditorProps {
 export function CodeEditor({ onMount }: CodeEditorProps) {
 	const currentDoc = useStore((state) => state.currentDoc);
 	const theme = useStore((state) => state.theme);
+	const editorTheme = useStore((state) => state.editorTheme);
 	const updateCurrentDocument = useStore(
 		(state) => state.updateCurrentDocument,
 	);
@@ -21,7 +22,7 @@ export function CodeEditor({ onMount }: CodeEditorProps) {
 			rules: [],
 			colors: {
 				"editor.background": "#09090b", // zinc-950
-                "editor.foreground": "#fafafa", // zinc-50
+				"editor.foreground": "#fafafa", // zinc-50
 			},
 		});
 		monaco.editor.defineTheme("custom-light", {
@@ -30,7 +31,34 @@ export function CodeEditor({ onMount }: CodeEditorProps) {
 			rules: [],
 			colors: {
 				"editor.background": "#ffffff",
-                "editor.foreground": "#09090b", // zinc-950
+				"editor.foreground": "#09090b", // zinc-950
+			},
+		});
+		monaco.editor.defineTheme("github-dark", {
+			base: "vs-dark",
+			inherit: true,
+			rules: [],
+			colors: {
+				"editor.background": "#0d1117",
+				"editor.foreground": "#c9d1d9",
+			},
+		});
+		monaco.editor.defineTheme("dracula", {
+			base: "vs-dark",
+			inherit: true,
+			rules: [],
+			colors: {
+				"editor.background": "#282a36",
+				"editor.foreground": "#f8f8f2",
+			},
+		});
+		monaco.editor.defineTheme("monokai", {
+			base: "vs-dark",
+			inherit: true,
+			rules: [],
+			colors: {
+				"editor.background": "#272822",
+				"editor.foreground": "#f8f8f2",
 			},
 		});
 	};
@@ -110,7 +138,7 @@ export function CodeEditor({ onMount }: CodeEditorProps) {
 				onChange={handleEditorChange}
 				beforeMount={handleEditorWillMount}
                 onMount={handleEditorMount}
-				theme={theme === "dark" ? "custom-dark" : "custom-light"}
+				theme={editorTheme}
 				options={{
 					minimap: { enabled: false },
 					fontSize: 14,

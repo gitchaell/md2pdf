@@ -166,6 +166,8 @@ interface PreviewProps {
 
 export function Preview({ scrollRef }: PreviewProps) {
 	const currentDoc = useStore((state) => state.currentDoc);
+    const previewFont = useStore((state) => state.previewFont);
+    const setPreviewFont = useStore((state) => state.setPreviewFont);
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	const handlePrint = useReactToPrint({
@@ -173,6 +175,18 @@ export function Preview({ scrollRef }: PreviewProps) {
 		documentTitle: currentDoc?.title || "document",
 		onAfterPrint: () => console.log("Printed successfully"),
 	});
+
+    const getFontFamily = () => {
+        switch (previewFont) {
+            case "serif":
+                return '"Merriweather", "Georgia", serif';
+            case "mono":
+                return '"Geist Mono", monospace';
+            case "sans":
+            default:
+                return '"Geist Sans", sans-serif';
+        }
+    };
 
 	if (!currentDoc) {
 		return (
@@ -189,6 +203,15 @@ export function Preview({ scrollRef }: PreviewProps) {
 					Preview
 				</h2>
 				<div className="flex items-center gap-2">
+                    <select
+                        value={previewFont}
+                        onChange={(e) => setPreviewFont(e.target.value)}
+                        className="h-8 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        <option value="sans">Sans</option>
+                        <option value="serif">Serif</option>
+                        <option value="mono">Mono</option>
+                    </select>
 					<Button
 						onClick={() => handlePrint()}
 						size="sm"
@@ -214,7 +237,7 @@ export function Preview({ scrollRef }: PreviewProps) {
 						"print:shadow-none print:m-0 print:w-full print:h-auto print:overflow-visible print:p-0",
 					)}
 					style={{
-						fontFamily: '"Geist Sans", sans-serif',
+						fontFamily: getFontFamily(),
 					}}
 				>
 					<style type="text/css" media="print">

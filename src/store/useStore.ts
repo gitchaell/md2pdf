@@ -9,6 +9,8 @@ interface EditorState {
     sidebarWidth: number;
     editorWidthPercent: number; // Percentage of the available space
     isLoading: boolean;
+    editorTheme: string;
+    previewFont: string;
 
 	// Actions
 	loadDocuments: () => Promise<void>;
@@ -18,6 +20,8 @@ interface EditorState {
 	deleteDocument: (id: number) => Promise<void>;
 	selectDocument: (id: number) => void;
 	setTheme: (theme: "light" | "dark") => void;
+	setEditorTheme: (theme: string) => void;
+	setPreviewFont: (font: string) => void;
 	toggleSidebar: () => void;
     setSidebarWidth: (width: number) => void;
     setEditorWidthPercent: (percent: number) => void;
@@ -35,6 +39,8 @@ export const useStore = create<EditorState>((set, get) => ({
     sidebarWidth: 256, // Default 16rem
     editorWidthPercent: 50, // Default 50%
     isLoading: true,
+    editorTheme: "vs-dark",
+    previewFont: "sans",
 
 	loadDocuments: async () => {
 		const docs = await db.documents.orderBy("updatedAt").reverse().toArray();
@@ -138,6 +144,9 @@ export const useStore = create<EditorState>((set, get) => ({
 			}
 		}
 	},
+
+    setEditorTheme: (theme) => set({ editorTheme: theme }),
+    setPreviewFont: (font) => set({ previewFont: font }),
 
 	toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
     setSidebarWidth: (width) => set({ sidebarWidth: width }),

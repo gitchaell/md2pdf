@@ -22,6 +22,8 @@ export function App() {
     const toggleSidebar = useStore((state) => state.toggleSidebar);
     const editorWidthPercent = useStore((state) => state.editorWidthPercent);
     const setEditorWidthPercent = useStore((state) => state.setEditorWidthPercent);
+    const editorTheme = useStore((state) => state.editorTheme);
+    const setEditorTheme = useStore((state) => state.setEditorTheme);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -118,7 +120,7 @@ export function App() {
                         )}
                         style={{ width: activeTab === 'editor' && window.innerWidth < 768 ? '100%' : `${editorWidthPercent}%` }}
                     >
-						<div className="h-14 border-b border-zinc-200 dark:border-zinc-800 flex items-center px-4 bg-white dark:bg-zinc-950 shrink-0">
+						<div className="h-14 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-4 bg-white dark:bg-zinc-950 shrink-0">
 							{currentDoc ? (
 								<Input
 									value={currentDoc.title}
@@ -131,6 +133,19 @@ export function App() {
 									Select a document
 								</span>
 							)}
+                            <div className="flex items-center gap-2">
+                                <select
+                                    value={editorTheme}
+                                    onChange={(e) => setEditorTheme(e.target.value)}
+                                    className="h-8 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    <option value="vs-dark">Dark (Default)</option>
+                                    <option value="custom-light">Light</option>
+                                    <option value="github-dark">GitHub Dark</option>
+                                    <option value="dracula">Dracula</option>
+                                    <option value="monokai">Monokai</option>
+                                </select>
+                            </div>
 						</div>
 						<div className="flex-1 overflow-hidden relative">
 							<CodeEditor onMount={(editor) => { editorRef.current = editor; }} />
