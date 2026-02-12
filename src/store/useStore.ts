@@ -8,6 +8,7 @@ interface EditorState {
 	sidebarOpen: boolean;
     sidebarWidth: number;
     editorWidthPercent: number; // Percentage of the available space
+    isLoading: boolean;
 
 	// Actions
 	loadDocuments: () => Promise<void>;
@@ -33,6 +34,7 @@ export const useStore = create<EditorState>((set, get) => ({
 	sidebarOpen: true,
     sidebarWidth: 256, // Default 16rem
     editorWidthPercent: 50, // Default 50%
+    isLoading: true,
 
 	loadDocuments: async () => {
 		const docs = await db.documents.orderBy("updatedAt").reverse().toArray();
@@ -42,9 +44,24 @@ export const useStore = create<EditorState>((set, get) => ({
 		if (!get().currentDoc && docs.length > 0) {
 			set({ currentDoc: docs[0] });
 		}
+        set({ isLoading: false });
 	},
 
 	createDocument: async () => {
+		const { documents } = get();
+
+		// Check if an empty untitled document already exists
+		const existingEmptyDoc = documents.find(
+			(d) =>
+				d.title === "Untitled Document" &&
+				(d.content === "" || d.content === "# New Document\n\nStart typing..."),
+		);
+
+		if (existingEmptyDoc) {
+			set({ currentDoc: existingEmptyDoc });
+			return;
+		}
+
 		const newDoc: Document = {
 			title: "Untitled Document",
 			content: "# New Document\n\nStart typing...",

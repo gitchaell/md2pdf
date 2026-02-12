@@ -203,7 +203,7 @@ export function Preview({ scrollRef }: PreviewProps) {
 
 			<div
                 ref={scrollRef}
-                className="flex-1 overflow-auto p-8 flex justify-center items-start scroll-smooth"
+                className="flex-1 overflow-auto flex justify-center items-start scroll-smooth"
             >
 				<div
 					ref={contentRef}
