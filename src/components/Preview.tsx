@@ -51,9 +51,9 @@ const Mermaid = ({ chart }: { chart: string }) => {
 
 	// biome-ignore lint/security/noDangerouslySetInnerHtml: Needed for Mermaid SVG
 	return (
-		<div className="overflow-x-auto my-4">
+		<div className="overflow-x-auto my-4 max-w-full">
 			<div
-				className="mermaid flex justify-center min-w-full"
+				className="mermaid flex justify-center w-full"
 				dangerouslySetInnerHTML={{ __html: svg }}
 			/>
 		</div>
@@ -93,7 +93,10 @@ const CodeBlock = ({ inline, className, children, ...props }: any) => {
 							{match[1]}
 						</span>
 					</div>
-					<pre className={cn(className, "p-4 overflow-x-auto m-0")} {...props}>
+					<pre
+						className={cn(className, "p-4 overflow-x-auto m-0 max-w-full")}
+						{...props}
+					>
 						<code className={cn(className, "font-mono text-sm")} {...props}>
 							{children}
 						</code>
@@ -275,7 +278,7 @@ export function Preview({ scrollRef }: PreviewProps) {
 							// biome-ignore lint/suspicious/noExplicitAny: Complex type
 							img: MarkdownImage,
 							table: ({ node, ...props }) => (
-								<div className="overflow-x-auto my-4">
+								<div className="overflow-x-auto my-4 max-w-full">
 									<table
 										className="w-full text-sm border-collapse"
 										{...props}
