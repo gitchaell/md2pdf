@@ -1,10 +1,10 @@
 import { Editor, type Monaco } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
-import { useStore } from "../store/useStore";
 import { db } from "../lib/db";
+import { useStore } from "../store/useStore";
 
 interface CodeEditorProps {
-    onMount?: (editor: editor.IStandaloneCodeEditor) => void;
+	onMount?: (editor: editor.IStandaloneCodeEditor) => void;
 }
 
 export function CodeEditor({ onMount }: CodeEditorProps) {
@@ -90,56 +90,59 @@ export function CodeEditor({ onMount }: CodeEditorProps) {
 		});
 	};
 
-    const handleEditorMount = (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
-        onMount?.(editor);
+	const handleEditorMount = (
+		editor: editor.IStandaloneCodeEditor,
+		monaco: Monaco,
+	) => {
+		onMount?.(editor);
 
-        // Add event listener to the editor's dom node
-        const domNode = editor.getDomNode();
-        if (domNode) {
-             // We need to use a type assertion or handle the event manually because
-             // ClipboardEvent is not generic in standard DOM types in this context
-            domNode.addEventListener('paste', async (event: Event) => {
-                const e = event as ClipboardEvent;
-                if (e.clipboardData && e.clipboardData.items) {
-                    const items = e.clipboardData.items;
-                    for (let i = 0; i < items.length; i++) {
-                        if (items[i].type.indexOf("image") !== -1) {
-                            e.preventDefault();
-                            const blob = items[i].getAsFile();
-                            if (blob) {
-                                try {
-                                    // Save to DB
-                                    const id = await db.images.add({
-                                        blob: blob,
-                                        mimeType: blob.type,
-                                        createdAt: new Date(),
-                                    });
+		// Add event listener to the editor's dom node
+		const domNode = editor.getDomNode();
+		if (domNode) {
+			// We need to use a type assertion or handle the event manually because
+			// ClipboardEvent is not generic in standard DOM types in this context
+			domNode.addEventListener("paste", async (event: Event) => {
+				const e = event as ClipboardEvent;
+				if (e.clipboardData && e.clipboardData.items) {
+					const items = e.clipboardData.items;
+					for (let i = 0; i < items.length; i++) {
+						if (items[i].type.indexOf("image") !== -1) {
+							e.preventDefault();
+							const blob = items[i].getAsFile();
+							if (blob) {
+								try {
+									// Save to DB
+									const id = await db.images.add({
+										blob: blob,
+										mimeType: blob.type,
+										createdAt: new Date(),
+									});
 
-                                    // Insert markdown
-                                    // We need to execute the edit on the editor model
-                                    const selection = editor.getSelection();
-                                    const idString = `local-image://${id}`;
-                                    const text = `![Image](${idString})`;
+									// Insert markdown
+									// We need to execute the edit on the editor model
+									const selection = editor.getSelection();
+									const idString = `local-image://${id}`;
+									const text = `![Image](${idString})`;
 
-                                    if (selection) {
-                                        const op = {
-                                            range: selection,
-                                            text: text,
-                                            forceMoveMarkers: true
-                                        };
-                                        editor.executeEdits("my-source", [op]);
-                                    }
-                                } catch (err) {
-                                    console.error("Failed to save image", err);
-                                }
-                            }
-                            return; // Handle only the first image
-                        }
-                    }
-                }
-            });
-        }
-    };
+									if (selection) {
+										const op = {
+											range: selection,
+											text: text,
+											forceMoveMarkers: true,
+										};
+										editor.executeEdits("my-source", [op]);
+									}
+								} catch (err) {
+									console.error("Failed to save image", err);
+								}
+							}
+							return; // Handle only the first image
+						}
+					}
+				}
+			});
+		}
+	};
 
 	const handleEditorChange = (value: string | undefined) => {
 		if (value !== undefined) {
@@ -164,7 +167,7 @@ export function CodeEditor({ onMount }: CodeEditorProps) {
 				value={currentDoc.content}
 				onChange={handleEditorChange}
 				beforeMount={handleEditorWillMount}
-                onMount={handleEditorMount}
+				onMount={handleEditorMount}
 				theme={editorTheme}
 				options={{
 					minimap: { enabled: false },
