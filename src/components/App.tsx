@@ -1,5 +1,5 @@
 import { Analytics } from "@vercel/analytics/react";
-import { Eye, FileEdit, Menu } from "lucide-react";
+import { ChevronDown, Eye, FileEdit, Menu, Palette } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { editor } from "monaco-editor";
 import { useStore } from "../store/useStore";
@@ -134,17 +134,24 @@ export function App() {
 								</span>
 							)}
                             <div className="flex items-center gap-2">
-                                <select
-                                    value={editorTheme}
-                                    onChange={(e) => setEditorTheme(e.target.value)}
-                                    className="h-8 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    <option value="vs-dark">Dark (Default)</option>
-                                    <option value="custom-light">Light</option>
-                                    <option value="github-dark">GitHub Dark</option>
-                                    <option value="dracula">Dracula</option>
-                                    <option value="monokai">Monokai</option>
-                                </select>
+                                <div className="relative">
+                                    <Palette className="absolute left-2 top-2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                                    <select
+                                        value={editorTheme}
+                                        onChange={(e) => setEditorTheme(e.target.value)}
+                                        className="h-8 w-40 appearance-none rounded-md border border-input bg-background pl-8 pr-8 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        <option value="vs-dark">Dark (Default)</option>
+                                        <option value="custom-light">Light</option>
+                                        <option value="github-dark">GitHub Dark</option>
+                                        <option value="dracula">Dracula</option>
+                                        <option value="monokai">Monokai</option>
+                                        <option value="solarized-dark">Solarized Dark</option>
+                                        <option value="solarized-light">Solarized Light</option>
+                                        <option value="nord">Nord</option>
+                                    </select>
+                                    <ChevronDown className="pointer-events-none absolute right-2 top-2 h-4 w-4 text-muted-foreground opacity-50" />
+                                </div>
                             </div>
 						</div>
 						<div className="flex-1 overflow-hidden relative">

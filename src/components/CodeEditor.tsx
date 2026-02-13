@@ -61,6 +61,33 @@ export function CodeEditor({ onMount }: CodeEditorProps) {
 				"editor.foreground": "#f8f8f2",
 			},
 		});
+		monaco.editor.defineTheme("solarized-dark", {
+			base: "vs-dark",
+			inherit: true,
+			rules: [],
+			colors: {
+				"editor.background": "#002b36",
+				"editor.foreground": "#839496",
+			},
+		});
+		monaco.editor.defineTheme("solarized-light", {
+			base: "vs",
+			inherit: true,
+			rules: [],
+			colors: {
+				"editor.background": "#fdf6e3",
+				"editor.foreground": "#657b83",
+			},
+		});
+		monaco.editor.defineTheme("nord", {
+			base: "vs-dark",
+			inherit: true,
+			rules: [],
+			colors: {
+				"editor.background": "#2e3440",
+				"editor.foreground": "#d8dee9",
+			},
+		});
 	};
 
     const handleEditorMount = (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
