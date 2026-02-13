@@ -11,6 +11,7 @@ export function CodeEditor({ onMount }: CodeEditorProps) {
 	const currentDoc = useStore((state) => state.currentDoc);
 	const theme = useStore((state) => state.theme);
 	const editorTheme = useStore((state) => state.editorTheme);
+	const editorSettings = useStore((state) => state.editorSettings);
 	const updateCurrentDocument = useStore(
 		(state) => state.updateCurrentDocument,
 	);
@@ -170,15 +171,15 @@ export function CodeEditor({ onMount }: CodeEditorProps) {
 				onMount={handleEditorMount}
 				theme={editorTheme}
 				options={{
-					minimap: { enabled: false },
-					fontSize: 14,
-					wordWrap: "on",
+					minimap: { enabled: editorSettings.minimap },
+					fontSize: editorSettings.fontSize,
+					wordWrap: editorSettings.wordWrap,
 					fontFamily: '"Geist Mono", monospace',
 					padding: { top: 24, bottom: 24 },
 					scrollBeyondLastLine: false,
-					lineNumbers: "off",
+					lineNumbers: editorSettings.lineNumbers,
 					glyphMargin: false,
-					folding: false,
+					folding: editorSettings.folding,
 					renderLineHighlight: "all",
 					hideCursorInOverviewRuler: true,
 					overviewRulerBorder: false,

@@ -1,6 +1,15 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { type Document, db } from "../lib/db";
+import { EXAMPLE_MARKDOWN } from "../lib/example-markdown";
+
+interface EditorSettings {
+	wordWrap: "on" | "off" | "wordWrapColumn" | "bounded";
+	minimap: boolean;
+	lineNumbers: "on" | "off" | "relative" | "interval";
+	folding: boolean;
+	fontSize: number;
+}
 
 interface EditorState {
 	documents: Document[];
@@ -12,10 +21,12 @@ interface EditorState {
 	isLoading: boolean;
 	editorTheme: string;
 	previewFont: string;
+	editorSettings: EditorSettings;
 
 	// Actions
 	loadDocuments: () => Promise<void>;
-	createDocument: () => Promise<void>;
+	createDocument: (content?: string, title?: string) => Promise<void>;
+	setEditorSettings: (settings: Partial<EditorSettings>) => void;
 	updateCurrentDocument: (content: string) => Promise<void>;
 	clearCurrentDocument: () => Promise<void>;
 	updateTitle: (id: number, title: string) => Promise<void>;
@@ -45,6 +56,13 @@ export const useStore = create<EditorState>()(
 			isLoading: true,
 			editorTheme: "vs-dark",
 			previewFont: "sans",
+			editorSettings: {
+				wordWrap: "on",
+				minimap: false,
+				lineNumbers: "off",
+				folding: false,
+				fontSize: 14,
+			},
 
 			loadDocuments: async () => {
 				const docs = await db.documents
@@ -60,25 +78,38 @@ export const useStore = create<EditorState>()(
 				set({ isLoading: false });
 			},
 
-			createDocument: async () => {
+			createDocument: async (content?: string, title?: string) => {
 				const { documents } = get();
 
-				// Check if an empty untitled document already exists
-				const existingEmptyDoc = documents.find(
-					(d) =>
-						d.title === "Untitled Document" &&
-						(d.content === "" ||
-							d.content === "# New Document\n\nStart typing..."),
-				);
+				let initialContent = content;
+				let initialTitle = title || "Untitled Document";
 
-				if (existingEmptyDoc) {
-					set({ currentDoc: existingEmptyDoc });
-					return;
+				// If no content provided and no documents exist, use example
+				if (content === undefined && documents.length === 0) {
+					initialContent = EXAMPLE_MARKDOWN;
+					initialTitle = "Welcome to Markdown Editor";
+				} else if (content === undefined) {
+					initialContent = "# New Document\n\nStart typing...";
+				}
+
+				// Check if an empty untitled document already exists (only if we are not creating a specific content)
+				if (content === undefined && documents.length > 0) {
+					const existingEmptyDoc = documents.find(
+						(d) =>
+							d.title === "Untitled Document" &&
+							(d.content === "" ||
+								d.content === "# New Document\n\nStart typing..."),
+					);
+
+					if (existingEmptyDoc) {
+						set({ currentDoc: existingEmptyDoc });
+						return;
+					}
 				}
 
 				const newDoc: Document = {
-					title: "Untitled Document",
-					content: "# New Document\n\nStart typing...",
+					title: initialTitle,
+					content: initialContent || "",
 					updatedAt: new Date(),
 				};
 
@@ -186,6 +217,10 @@ export const useStore = create<EditorState>()(
 
 			setEditorTheme: (theme) => set({ editorTheme: theme }),
 			setPreviewFont: (font) => set({ previewFont: font }),
+			setEditorSettings: (settings) =>
+				set((state) => ({
+					editorSettings: { ...state.editorSettings, ...settings },
+				})),
 
 			toggleSidebar: () =>
 				set((state) => ({ sidebarOpen: !state.sidebarOpen })),
@@ -201,6 +236,7 @@ export const useStore = create<EditorState>()(
 				sidebarWidth: state.sidebarWidth,
 				editorWidthPercent: state.editorWidthPercent,
 				sidebarOpen: state.sidebarOpen,
+				editorSettings: state.editorSettings,
 			}),
 		},
 	),

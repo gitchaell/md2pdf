@@ -5,22 +5,29 @@ import {
 	FileEdit,
 	Menu,
 	Palette,
+	Settings,
 	Trash2,
+	Wand2,
 } from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { useScrollSync } from "../hooks/useScrollSync";
+import { formatMarkdown } from "../lib/formatter";
 import { cn } from "../lib/utils";
 import { useStore } from "../store/useStore";
 import { CodeEditor } from "./CodeEditor";
 import { Preview } from "./Preview";
 import { Sidebar } from "./Sidebar";
+import { Dialog } from "./ui/Dialog";
 import { Input } from "./ui/Input";
 import { Resizer } from "./ui/Resizer";
 
 export function App() {
 	const loadDocuments = useStore((state) => state.loadDocuments);
 	const currentDoc = useStore((state) => state.currentDoc);
+	const updateCurrentDocument = useStore(
+		(state) => state.updateCurrentDocument,
+	);
 	const clearCurrentDocument = useStore((state) => state.clearCurrentDocument);
 	const updateTitle = useStore((state) => state.updateTitle);
 	const theme = useStore((state) => state.theme);
@@ -34,12 +41,15 @@ export function App() {
 	);
 	const editorTheme = useStore((state) => state.editorTheme);
 	const setEditorTheme = useStore((state) => state.setEditorTheme);
+	const editorSettings = useStore((state) => state.editorSettings);
+	const setEditorSettings = useStore((state) => state.setEditorSettings);
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 	const previewScrollRef = useRef<HTMLDivElement>(null);
 
 	const [activeTab, setActiveTab] = useState<"editor" | "preview">("editor");
+	const [showSettings, setShowSettings] = useState(false);
 
 	// Enable scroll sync only when both panels are visible (Desktop)
 	useScrollSync(
@@ -84,6 +94,13 @@ export function App() {
 		// Limit between 20% and 80%
 		const limitedPercent = Math.max(20, Math.min(80, newPercent));
 		setEditorWidthPercent(limitedPercent);
+	};
+
+	const handleFormat = async () => {
+		if (currentDoc) {
+			const formatted = await formatMarkdown(currentDoc.content);
+			updateCurrentDocument(formatted);
+		}
 	};
 
 	return (
@@ -177,6 +194,14 @@ export function App() {
 								>
 									<Trash2 size={16} />
 								</button>
+								<button
+									type="button"
+									onClick={handleFormat}
+									className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md text-muted-foreground transition-colors cursor-pointer"
+									title="Format Document"
+								>
+									<Wand2 size={16} />
+								</button>
 								<div className="relative">
 									<Palette className="absolute left-2 top-2 h-4 w-4 text-muted-foreground pointer-events-none" />
 									<select
@@ -195,6 +220,14 @@ export function App() {
 									</select>
 									<ChevronDown className="pointer-events-none absolute right-2 top-2 h-4 w-4 text-muted-foreground opacity-50" />
 								</div>
+								<button
+									type="button"
+									onClick={() => setShowSettings(true)}
+									className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md text-muted-foreground transition-colors cursor-pointer"
+									title="Editor Settings"
+								>
+									<Settings size={16} />
+								</button>
 							</div>
 						</div>
 						<div className="flex-1 overflow-hidden relative">
@@ -232,6 +265,77 @@ export function App() {
 				</div>
 			</div>
 			<Analytics />
+			<Dialog
+				open={showSettings}
+				onOpenChange={setShowSettings}
+				title="Editor Settings"
+			>
+				<div className="space-y-4">
+					<div className="flex items-center justify-between">
+						<label className="text-sm font-medium">Word Wrap</label>
+						<select
+							value={editorSettings.wordWrap}
+							// biome-ignore lint/suspicious/noExplicitAny: enum casting
+							onChange={(e) =>
+								setEditorSettings({ wordWrap: e.target.value as any })
+							}
+							className="h-8 rounded-md border border-input bg-background px-3 text-sm"
+						>
+							<option value="on">On</option>
+							<option value="off">Off</option>
+							<option value="wordWrapColumn">Word Wrap Column</option>
+							<option value="bounded">Bounded</option>
+						</select>
+					</div>
+					<div className="flex items-center justify-between">
+						<label className="text-sm font-medium">Line Numbers</label>
+						<select
+							value={editorSettings.lineNumbers}
+							// biome-ignore lint/suspicious/noExplicitAny: enum casting
+							onChange={(e) =>
+								setEditorSettings({ lineNumbers: e.target.value as any })
+							}
+							className="h-8 rounded-md border border-input bg-background px-3 text-sm"
+						>
+							<option value="on">On</option>
+							<option value="off">Off</option>
+							<option value="relative">Relative</option>
+							<option value="interval">Interval</option>
+						</select>
+					</div>
+					<div className="flex items-center justify-between">
+						<label className="text-sm font-medium">Minimap</label>
+						<input
+							type="checkbox"
+							checked={editorSettings.minimap}
+							onChange={(e) => setEditorSettings({ minimap: e.target.checked })}
+							className="h-4 w-4 rounded border-zinc-300 text-primary focus:ring-primary"
+						/>
+					</div>
+					<div className="flex items-center justify-between">
+						<label className="text-sm font-medium">Folding</label>
+						<input
+							type="checkbox"
+							checked={editorSettings.folding}
+							onChange={(e) => setEditorSettings({ folding: e.target.checked })}
+							className="h-4 w-4 rounded border-zinc-300 text-primary focus:ring-primary"
+						/>
+					</div>
+					<div className="flex items-center justify-between">
+						<label className="text-sm font-medium">Font Size</label>
+						<input
+							type="number"
+							value={editorSettings.fontSize}
+							onChange={(e) =>
+								setEditorSettings({ fontSize: parseInt(e.target.value) })
+							}
+							className="h-8 w-20 rounded-md border border-input bg-background px-3 text-sm"
+							min={10}
+							max={30}
+						/>
+					</div>
+				</div>
+			</Dialog>
 		</div>
 	);
 }
