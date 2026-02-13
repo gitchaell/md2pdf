@@ -4,10 +4,10 @@ import { type MutableRefObject, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useReactToPrint } from "react-to-print";
 import remarkGfm from "remark-gfm";
+import { db } from "../lib/db";
 import { cn } from "../lib/utils";
 import { useStore } from "../store/useStore";
 import { Button } from "./ui/Button";
-import { db } from "../lib/db";
 
 const Mermaid = ({ chart }: { chart: string }) => {
 	const [svg, setSvg] = useState("");
@@ -51,10 +51,12 @@ const Mermaid = ({ chart }: { chart: string }) => {
 
 	// biome-ignore lint/security/noDangerouslySetInnerHtml: Needed for Mermaid SVG
 	return (
-		<div
-			className="mermaid flex justify-center my-4"
-			dangerouslySetInnerHTML={{ __html: svg }}
-		/>
+		<div className="overflow-x-auto my-4">
+			<div
+				className="mermaid flex justify-center min-w-full"
+				dangerouslySetInnerHTML={{ __html: svg }}
+			/>
+		</div>
 	);
 };
 
@@ -117,57 +119,57 @@ const CodeBlock = ({ inline, className, children, ...props }: any) => {
 // Custom Image Component to handle local images
 // biome-ignore lint/suspicious/noExplicitAny: Complex type
 const MarkdownImage = ({ node, ...props }: any) => {
-    const [src, setSrc] = useState(props.src);
+	const [src, setSrc] = useState(props.src);
 
-    useEffect(() => {
-        let objectUrl: string | null = null;
+	useEffect(() => {
+		let objectUrl: string | null = null;
 
-        const loadLocalImage = async () => {
-             if (props.src && props.src.startsWith('local-image://')) {
-                 try {
-                     const id = parseInt(props.src.replace('local-image://', ''), 10);
-                     if (!isNaN(id)) {
-                         const image = await db.images.get(id);
-                         if (image) {
-                             objectUrl = URL.createObjectURL(image.blob);
-                             setSrc(objectUrl);
-                         }
-                     }
-                 } catch (err) {
-                     console.error("Failed to load local image", err);
-                 }
-             } else {
-                 setSrc(props.src);
-             }
-        };
+		const loadLocalImage = async () => {
+			if (props.src && props.src.startsWith("local-image://")) {
+				try {
+					const id = parseInt(props.src.replace("local-image://", ""), 10);
+					if (!isNaN(id)) {
+						const image = await db.images.get(id);
+						if (image) {
+							objectUrl = URL.createObjectURL(image.blob);
+							setSrc(objectUrl);
+						}
+					}
+				} catch (err) {
+					console.error("Failed to load local image", err);
+				}
+			} else {
+				setSrc(props.src);
+			}
+		};
 
-        loadLocalImage();
+		loadLocalImage();
 
-        return () => {
-            if (objectUrl) {
-                URL.revokeObjectURL(objectUrl);
-            }
-        };
-    }, [props.src]);
+		return () => {
+			if (objectUrl) {
+				URL.revokeObjectURL(objectUrl);
+			}
+		};
+	}, [props.src]);
 
-    return (
-        <img
-            className="max-w-full h-auto rounded-md shadow-sm my-4 mx-auto"
-            alt={props.alt || "Markdown Image"}
-            {...props}
-            src={src}
-        />
-    );
+	return (
+		<img
+			className="max-w-full h-auto rounded-md shadow-sm my-4 mx-auto"
+			alt={props.alt || "Markdown Image"}
+			{...props}
+			src={src}
+		/>
+	);
 };
 
 interface PreviewProps {
-    scrollRef?: MutableRefObject<HTMLDivElement | null>;
+	scrollRef?: MutableRefObject<HTMLDivElement | null>;
 }
 
 export function Preview({ scrollRef }: PreviewProps) {
 	const currentDoc = useStore((state) => state.currentDoc);
-    const previewFont = useStore((state) => state.previewFont);
-    const setPreviewFont = useStore((state) => state.setPreviewFont);
+	const previewFont = useStore((state) => state.previewFont);
+	const setPreviewFont = useStore((state) => state.setPreviewFont);
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	const handlePrint = useReactToPrint({
@@ -176,27 +178,27 @@ export function Preview({ scrollRef }: PreviewProps) {
 		onAfterPrint: () => console.log("Printed successfully"),
 	});
 
-    const getFontFamily = () => {
-        switch (previewFont) {
-            case "serif":
-                return '"Merriweather", "Georgia", serif';
-            case "mono":
-                return '"Geist Mono", monospace';
-            case "inter":
-                return 'Inter, system-ui, sans-serif';
-            case "arial":
-                return 'Arial, Helvetica, sans-serif';
-            case "times":
-                return '"Times New Roman", Times, serif';
-            case "georgia":
-                return 'Georgia, serif';
-            case "courier":
-                return '"Courier New", Courier, monospace';
-            case "sans":
-            default:
-                return '"Geist Sans", sans-serif';
-        }
-    };
+	const getFontFamily = () => {
+		switch (previewFont) {
+			case "serif":
+				return '"Merriweather", "Georgia", serif';
+			case "mono":
+				return '"Geist Mono", monospace';
+			case "inter":
+				return "Inter, system-ui, sans-serif";
+			case "arial":
+				return "Arial, Helvetica, sans-serif";
+			case "times":
+				return '"Times New Roman", Times, serif';
+			case "georgia":
+				return "Georgia, serif";
+			case "courier":
+				return '"Courier New", Courier, monospace';
+			case "sans":
+			default:
+				return '"Geist Sans", sans-serif';
+		}
+	};
 
 	if (!currentDoc) {
 		return (
@@ -213,24 +215,24 @@ export function Preview({ scrollRef }: PreviewProps) {
 					Preview
 				</h2>
 				<div className="flex items-center gap-2">
-                    <div className="relative">
-                        <Type className="absolute left-2 top-2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <select
-                            value={previewFont}
-                            onChange={(e) => setPreviewFont(e.target.value)}
-                            className="h-8 w-40 appearance-none rounded-md border border-input bg-background pl-8 pr-8 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            <option value="sans">Geist Sans</option>
-                            <option value="serif">Merriweather</option>
-                            <option value="mono">Geist Mono</option>
-                            <option value="inter">Inter</option>
-                            <option value="arial">Arial</option>
-                            <option value="times">Times New Roman</option>
-                            <option value="georgia">Georgia</option>
-                            <option value="courier">Courier New</option>
-                        </select>
-                        <ChevronDown className="pointer-events-none absolute right-2 top-2 h-4 w-4 text-muted-foreground opacity-50" />
-                    </div>
+					<div className="relative">
+						<Type className="absolute left-2 top-2 h-4 w-4 text-muted-foreground pointer-events-none" />
+						<select
+							value={previewFont}
+							onChange={(e) => setPreviewFont(e.target.value)}
+							className="h-8 w-40 appearance-none rounded-md border border-input bg-background pl-8 pr-8 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+						>
+							<option value="sans">Geist Sans</option>
+							<option value="serif">Merriweather</option>
+							<option value="mono">Geist Mono</option>
+							<option value="inter">Inter</option>
+							<option value="arial">Arial</option>
+							<option value="times">Times New Roman</option>
+							<option value="georgia">Georgia</option>
+							<option value="courier">Courier New</option>
+						</select>
+						<ChevronDown className="pointer-events-none absolute right-2 top-2 h-4 w-4 text-muted-foreground opacity-50" />
+					</div>
 					<Button
 						onClick={() => handlePrint()}
 						size="sm"
@@ -244,9 +246,9 @@ export function Preview({ scrollRef }: PreviewProps) {
 			</div>
 
 			<div
-                ref={scrollRef}
-                className="flex-1 overflow-auto flex justify-center items-start scroll-smooth"
-            >
+				ref={scrollRef}
+				className="flex-1 overflow-auto flex justify-center items-start scroll-smooth"
+			>
 				<div
 					ref={contentRef}
 					className={cn(

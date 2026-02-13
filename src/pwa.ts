@@ -1,11 +1,11 @@
-import { registerSW } from 'virtual:pwa-register'
+import { registerSW } from "virtual:pwa-register";
 
 registerSW({
-  immediate: true,
-  onNeedRefresh() {
-    console.log('onNeedRefresh')
-  },
-  onOfflineReady() {
-    console.log('onOfflineReady')
-  },
-})
+	immediate: true,
+	onNeedRefresh() {
+		console.log("onNeedRefresh");
+	},
+	onOfflineReady() {
+		console.log("onOfflineReady");
+	},
+});

@@ -1,15 +1,18 @@
 ---
-import '../styles/global.css';
-import { pwaInfo } from 'virtual:pwa-info';
+import "../styles/global.css";
+import { pwaInfo } from "virtual:pwa-info";
 
 interface Props {
-  title: string;
+	title: string;
 }
 
 const { title } = Astro.props;
-const description = "A real-time Markdown editor and PDF converter with PWA support. Create, edit, and export your markdown documents to PDF instantly.";
+const description =
+	"A real-time Markdown editor and PDF converter with PWA support. Create, edit, and export your markdown documents to PDF instantly.";
 const siteName = "Markdown Editor & PDF Converter";
-const url = Astro.site ? Astro.site.href : "https://markdown-editor-pdf.vercel.app";
+const url = Astro.site
+	? Astro.site.href
+	: "https://markdown-editor-pdf.vercel.app";
 ---
 
 <!doctype html>
