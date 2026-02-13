@@ -1,11 +1,14 @@
 import "highlight.js/styles/github-dark.css";
+import "katex/dist/katex.min.css";
 import { Check, ChevronDown, Copy, Printer, Type } from "lucide-react";
 import mermaid from "mermaid";
 import { type MutableRefObject, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useReactToPrint } from "react-to-print";
 import rehypeHighlight from "rehype-highlight";
+import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import { db } from "../lib/db";
 import { cn } from "../lib/utils";
 import { useStore } from "../store/useStore";
@@ -273,8 +276,8 @@ export function Preview({ scrollRef }: PreviewProps) {
                 `}
 					</style>
 					<ReactMarkdown
-						remarkPlugins={[remarkGfm]}
-						rehypePlugins={[rehypeHighlight]}
+						remarkPlugins={[remarkGfm, remarkMath]}
+						rehypePlugins={[rehypeHighlight, rehypeKatex]}
 						components={{
 							// biome-ignore lint/suspicious/noExplicitAny: Complex type
 							code: CodeBlock as any,
