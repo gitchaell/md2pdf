@@ -1,4 +1,4 @@
-import { Check, Copy, Printer } from "lucide-react";
+import { Check, ChevronDown, Copy, Printer, Type } from "lucide-react";
 import mermaid from "mermaid";
 import { type MutableRefObject, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -182,6 +182,16 @@ export function Preview({ scrollRef }: PreviewProps) {
                 return '"Merriweather", "Georgia", serif';
             case "mono":
                 return '"Geist Mono", monospace';
+            case "inter":
+                return 'Inter, system-ui, sans-serif';
+            case "arial":
+                return 'Arial, Helvetica, sans-serif';
+            case "times":
+                return '"Times New Roman", Times, serif';
+            case "georgia":
+                return 'Georgia, serif';
+            case "courier":
+                return '"Courier New", Courier, monospace';
             case "sans":
             default:
                 return '"Geist Sans", sans-serif';
@@ -203,15 +213,24 @@ export function Preview({ scrollRef }: PreviewProps) {
 					Preview
 				</h2>
 				<div className="flex items-center gap-2">
-                    <select
-                        value={previewFont}
-                        onChange={(e) => setPreviewFont(e.target.value)}
-                        className="h-8 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                        <option value="sans">Sans</option>
-                        <option value="serif">Serif</option>
-                        <option value="mono">Mono</option>
-                    </select>
+                    <div className="relative">
+                        <Type className="absolute left-2 top-2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <select
+                            value={previewFont}
+                            onChange={(e) => setPreviewFont(e.target.value)}
+                            className="h-8 w-40 appearance-none rounded-md border border-input bg-background pl-8 pr-8 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <option value="sans">Geist Sans</option>
+                            <option value="serif">Merriweather</option>
+                            <option value="mono">Geist Mono</option>
+                            <option value="inter">Inter</option>
+                            <option value="arial">Arial</option>
+                            <option value="times">Times New Roman</option>
+                            <option value="georgia">Georgia</option>
+                            <option value="courier">Courier New</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-2 top-2 h-4 w-4 text-muted-foreground opacity-50" />
+                    </div>
 					<Button
 						onClick={() => handlePrint()}
 						size="sm"
