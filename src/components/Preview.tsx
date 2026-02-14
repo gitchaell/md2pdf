@@ -1,6 +1,6 @@
 import "highlight.js/styles/github-dark.css";
 import "katex/dist/katex.min.css";
-import { Check, ChevronDown, Copy, Printer, Type } from "lucide-react";
+import { Check, ChevronDown, Copy, Download, Printer, Type } from "lucide-react";
 import mermaid from "mermaid";
 import { type MutableRefObject, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -10,6 +10,7 @@ import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { db } from "../lib/db";
+import { generatePDF } from "../lib/pdf";
 import { cn } from "../lib/utils";
 import { useStore } from "../store/useStore";
 import { Button } from "./ui/Button";
@@ -186,6 +187,12 @@ export function Preview({ scrollRef }: PreviewProps) {
 		onAfterPrint: () => console.log("Printed successfully"),
 	});
 
+	const handleDownloadPDF = () => {
+		if (contentRef.current) {
+			generatePDF(contentRef.current, currentDoc?.title || "document");
+		}
+	};
+
 	const getFontFamily = () => {
 		switch (previewFont) {
 			case "serif":
@@ -248,7 +255,16 @@ export function Preview({ scrollRef }: PreviewProps) {
 						className="h-8"
 					>
 						<Printer className="w-4 h-4 mr-2" />
-						Print / PDF
+						Print
+					</Button>
+					<Button
+						onClick={handleDownloadPDF}
+						size="sm"
+						variant="outline"
+						className="h-8"
+					>
+						<Download className="w-4 h-4 mr-2" />
+						PDF
 					</Button>
 				</div>
 			</div>
