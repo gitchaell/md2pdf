@@ -179,6 +179,7 @@ export function Preview({ scrollRef }: PreviewProps) {
 	const currentDoc = useStore((state) => state.currentDoc);
 	const previewFont = useStore((state) => state.previewFont);
 	const setPreviewFont = useStore((state) => state.setPreviewFont);
+	const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	const handlePrint = useReactToPrint({
@@ -188,8 +189,22 @@ export function Preview({ scrollRef }: PreviewProps) {
 	});
 
 	const handleDownloadPDF = () => {
-		if (contentRef.current) {
-			generatePDF(contentRef.current, currentDoc?.title || "document");
+		if (contentRef.current && !isGeneratingPDF) {
+			setIsGeneratingPDF(true);
+			// Use setTimeout to allow UI to update to "Generating..." state
+			// before the heavy synchronous work of html2canvas starts
+			setTimeout(async () => {
+				try {
+					if (contentRef.current) {
+						await generatePDF(contentRef.current, currentDoc?.title || "document");
+					}
+				} catch (error) {
+					console.error("PDF generation failed:", error);
+					alert("Failed to generate PDF. Please try again.");
+				} finally {
+					setIsGeneratingPDF(false);
+				}
+			}, 100);
 		}
 	};
 
@@ -262,9 +277,10 @@ export function Preview({ scrollRef }: PreviewProps) {
 						size="sm"
 						variant="outline"
 						className="h-8"
+						disabled={isGeneratingPDF}
 					>
 						<Download className="w-4 h-4 mr-2" />
-						PDF
+						{isGeneratingPDF ? "Generating..." : "PDF"}
 					</Button>
 				</div>
 			</div>
