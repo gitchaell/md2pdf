@@ -50,6 +50,35 @@ export function App() {
 
 	const [activeTab, setActiveTab] = useState<"editor" | "preview">("editor");
 	const [showSettings, setShowSettings] = useState(false);
+	const [viewportHeight, setViewportHeight] = useState<number | undefined>(
+		undefined,
+	);
+
+	useEffect(() => {
+		// Handle visual viewport resizing (e.g., when virtual keyboard opens on mobile)
+		const handleVisualViewportResize = () => {
+			if (window.visualViewport) {
+				setViewportHeight(window.visualViewport.height);
+			}
+		};
+
+		if (window.visualViewport) {
+			window.visualViewport.addEventListener(
+				"resize",
+				handleVisualViewportResize,
+			);
+			setViewportHeight(window.visualViewport.height);
+		}
+
+		return () => {
+			if (window.visualViewport) {
+				window.visualViewport.removeEventListener(
+					"resize",
+					handleVisualViewportResize,
+				);
+			}
+		};
+	}, []);
 
 	// Enable scroll sync only when both panels are visible (Desktop)
 	useScrollSync(
@@ -104,7 +133,10 @@ export function App() {
 	};
 
 	return (
-		<div className="flex h-[100dvh] w-screen overflow-hidden bg-background text-foreground font-sans relative">
+		<div
+			className="flex w-screen overflow-hidden bg-background text-foreground font-sans relative"
+			style={{ height: viewportHeight ? `${viewportHeight}px` : "100dvh" }}
+		>
 			<Sidebar />
 
 			<div className="flex-1 flex flex-col h-full overflow-hidden min-w-0 relative">
