@@ -27,6 +27,7 @@
     "dexie": "^4.3.0",
     "framer-motion": "^12.34.0",
     "highlight.js": "^11.11.1",
+    "html2pdf.js": "^0.14.0",
     "katex": "^0.16.28",
     "lucide-react": "^0.563.0",
     "mermaid": "^11.12.2",
@@ -46,5 +47,8 @@
     "typescript": "^5.9.3",
     "vite-plugin-pwa": "^1.2.0",
     "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@types/html2pdf.js": "^0.10.0"
   }
 }

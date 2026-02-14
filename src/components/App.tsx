@@ -104,7 +104,7 @@ export function App() {
 	};
 
 	return (
-		<div className="flex h-screen w-screen overflow-hidden bg-background text-foreground font-sans relative">
+		<div className="flex h-[100dvh] w-screen overflow-hidden bg-background text-foreground font-sans relative">
 			<Sidebar />
 
 			<div className="flex-1 flex flex-col h-full overflow-hidden min-w-0 relative">

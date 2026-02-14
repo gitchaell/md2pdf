@@ -1,5 +1,6 @@
 import { Editor, type Monaco } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
+import { cleanupMarkdown } from "../lib/cleanup";
 import { db } from "../lib/db";
 import { useStore } from "../store/useStore";
 
@@ -138,6 +139,24 @@ export function CodeEditor({ onMount }: CodeEditorProps) {
 								}
 							}
 							return; // Handle only the first image
+						}
+					}
+
+					// Handle text paste to cleanup
+					const text = e.clipboardData.getData("text/plain");
+					if (text) {
+						const cleaned = cleanupMarkdown(text);
+						if (cleaned !== text) {
+							e.preventDefault();
+							const selection = editor.getSelection();
+							if (selection) {
+								const op = {
+									range: selection,
+									text: cleaned,
+									forceMoveMarkers: true,
+								};
+								editor.executeEdits("paste-source", [op]);
+							}
 						}
 					}
 				}
