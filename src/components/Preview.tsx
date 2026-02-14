@@ -200,7 +200,7 @@ export function Preview({ scrollRef }: PreviewProps) {
 					}
 				} catch (error) {
 					console.error("PDF generation failed:", error);
-					alert("Failed to generate PDF. Please try again.");
+					setTimeout(() => alert("Failed to generate PDF. Please try again."), 100);
 				} finally {
 					setIsGeneratingPDF(false);
 				}
