@@ -50,7 +50,7 @@ const Mermaid = ({ chart }: { chart: string }) => {
 
 	if (error)
 		return (
-			<div className="text-red-500 text-sm p-2 border border-red-200 rounded bg-red-50 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400">
+			<div className="text-red-500 text-sm p-2 border border-red-200 rounded bg-red-50 dark:bg-[rgba(127,29,29,0.2)] dark:border-red-800 dark:text-red-400">
 				{error}
 			</div>
 		);
@@ -88,13 +88,13 @@ const CodeBlock = ({ inline, className, children, ...props }: any) => {
 					<button
 						type="button"
 						onClick={handleCopy}
-						className="p-1.5 bg-zinc-700/80 text-white rounded hover:bg-zinc-600 backdrop-blur-sm transition-colors cursor-pointer"
+						className="p-1.5 bg-[rgba(63,63,70,0.8)] text-white rounded hover:bg-zinc-600 backdrop-blur-sm transition-colors cursor-pointer"
 					>
 						{copied ? <Check size={14} /> : <Copy size={14} />}
 					</button>
 				</div>
 				<div className="rounded-md overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900">
-					<div className="flex items-center justify-between px-4 py-2 bg-zinc-200/50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
+					<div className="flex items-center justify-between px-4 py-2 bg-[rgba(228,228,231,0.5)] dark:bg-[rgba(39,39,42,0.5)] border-b border-zinc-200 dark:border-zinc-800">
 						<span className="text-xs text-muted-foreground font-mono">
 							{match[1]}
 						</span>

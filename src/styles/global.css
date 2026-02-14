@@ -27,6 +27,43 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+
+  /* Override colors with HEX values for html2canvas compatibility (it doesn't support oklch) */
+  --color-zinc-50: #fafafa;
+  --color-zinc-100: #f4f4f5;
+  --color-zinc-200: #e4e4e7;
+  --color-zinc-300: #d4d4d8;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-500: #71717a;
+  --color-zinc-600: #52525b;
+  --color-zinc-700: #3f3f46;
+  --color-zinc-800: #27272a;
+  --color-zinc-900: #18181b;
+  --color-zinc-950: #09090b;
+
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-red-800: #991b1b;
+  --color-red-900: #7f1d1d;
+  --color-red-950: #450a0a;
+
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-gray-950: #030712;
 }
 
 :root {
@@ -89,4 +126,46 @@ code, pre {
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-zinc-400 dark:bg-zinc-600;
+}
+
+/* Override typography plugin colors to use HEX variables (zinc) for html2canvas compatibility */
+.prose-zinc {
+  --tw-prose-body: var(--color-zinc-700);
+  --tw-prose-headings: var(--color-zinc-900);
+  --tw-prose-lead: var(--color-zinc-600);
+  --tw-prose-links: var(--color-zinc-900);
+  --tw-prose-bold: var(--color-zinc-900);
+  --tw-prose-counters: var(--color-zinc-500);
+  --tw-prose-bullets: var(--color-zinc-300);
+  --tw-prose-hr: var(--color-zinc-200);
+  --tw-prose-quotes: var(--color-zinc-900);
+  --tw-prose-quote-borders: var(--color-zinc-200);
+  --tw-prose-captions: var(--color-zinc-500);
+  --tw-prose-kbd: var(--color-zinc-900);
+  --tw-prose-kbd-shadows: var(--color-zinc-900);
+  --tw-prose-code: var(--color-zinc-900);
+  --tw-prose-pre-code: var(--color-zinc-200);
+  --tw-prose-pre-bg: var(--color-zinc-800);
+  --tw-prose-th-borders: var(--color-zinc-300);
+  --tw-prose-td-borders: var(--color-zinc-200);
+
+  /* Dark mode invert colors */
+  --tw-prose-invert-body: var(--color-zinc-300);
+  --tw-prose-invert-headings: #fff;
+  --tw-prose-invert-lead: var(--color-zinc-400);
+  --tw-prose-invert-links: #fff;
+  --tw-prose-invert-bold: #fff;
+  --tw-prose-invert-counters: var(--color-zinc-400);
+  --tw-prose-invert-bullets: var(--color-zinc-600);
+  --tw-prose-invert-hr: var(--color-zinc-700);
+  --tw-prose-invert-quotes: var(--color-zinc-100);
+  --tw-prose-invert-quote-borders: var(--color-zinc-700);
+  --tw-prose-invert-captions: var(--color-zinc-400);
+  --tw-prose-invert-kbd: #fff;
+  --tw-prose-invert-kbd-shadows: #fff;
+  --tw-prose-invert-code: #fff;
+  --tw-prose-invert-pre-code: var(--color-zinc-300);
+  --tw-prose-invert-pre-bg: rgb(0 0 0 / 50%);
+  --tw-prose-invert-th-borders: var(--color-zinc-600);
+  --tw-prose-invert-td-borders: var(--color-zinc-700);
 }

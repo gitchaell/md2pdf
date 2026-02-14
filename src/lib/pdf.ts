@@ -10,7 +10,8 @@ export const generatePDF = (
 		filename: filename,
 		image: { type: "jpeg", quality: 0.98 },
 		html2canvas: {
-			scale: isMobile ? 1 : 2, // Reduce scale on mobile to save memory
+			scale: isMobile ? 0.6 : 2, // Aggressively reduce scale on mobile to prevent crashes
+			logging: false,
 			useCORS: true,
 			letterRendering: true,
 			scrollY: 0,
