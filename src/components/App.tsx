@@ -1,4 +1,3 @@
-import { Analytics } from "@vercel/analytics/react";
 import {
 	ChevronDown,
 	Eye,
@@ -296,7 +295,6 @@ export function App() {
 					</div>
 				</div>
 			</div>
-			<Analytics />
 			<Dialog
 				open={showSettings}
 				onOpenChange={setShowSettings}

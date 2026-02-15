@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import Analytics from "@vercel/analytics/astro";
 import { pwaInfo } from "virtual:pwa-info";
 
 interface Props {
@@ -51,5 +52,6 @@ const url = Astro.site
   </head>
   <body>
     <slot />
+    <Analytics />
   </body>
 </html>
